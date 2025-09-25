@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import Button from "@/components/atoms/Button";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import dealService from "@/services/api/dealService";
+import contactService from "@/services/api/contactService";
+import ApperIcon from "@/components/ApperIcon";
 import SearchBar from "@/components/molecules/SearchBar";
 import Modal from "@/components/molecules/Modal";
 import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
 import DealForm from "@/components/organisms/DealForm";
 import PipelineBoard from "@/components/organisms/PipelineBoard";
-import ApperIcon from "@/components/ApperIcon";
-import dealService from "@/services/api/dealService";
-import contactService from "@/services/api/contactService";
-import { toast } from "react-toastify";
+import Button from "@/components/atoms/Button";
 
 const Deals = () => {
   const [deals, setDeals] = useState([]);
@@ -45,7 +45,15 @@ const Deals = () => {
 
   const handleCreateDeal = async (dealData) => {
     try {
-      const newDeal = await dealService.create(dealData);
+const newDeal = await dealService.create({
+        title_c: dealData.title,
+        value_c: dealData.value,
+        stage_c: dealData.stage,
+        contact_id_c: dealData.contactId,
+        probability_c: dealData.probability,
+        expected_close_date_c: dealData.expectedCloseDate,
+        description_c: dealData.description
+      });
       setDeals(prev => [newDeal, ...prev]);
     } catch (error) {
       throw new Error("Failed to create deal");
@@ -53,14 +61,23 @@ const Deals = () => {
   };
 
   const handleUpdateDeal = async (dealData) => {
-    try {
+try {
       let dealToUpdate = selectedDeal;
       let dealId = selectedDeal?.Id;
-
       // Handle both form updates and pipeline drag updates
       if (!selectedDeal && dealData.Id) {
         dealToUpdate = dealData;
         dealId = dealData.Id;
+      } else {
+        dealToUpdate = {
+          title_c: dealData.title,
+          value_c: dealData.value,
+          stage_c: dealData.stage,
+          contact_id_c: dealData.contactId,
+          probability_c: dealData.probability,
+          expected_close_date_c: dealData.expectedCloseDate,
+          description_c: dealData.description
+        };
       }
 
       const updatedDeal = await dealService.update(dealId, dealData);
@@ -93,13 +110,14 @@ const Deals = () => {
   };
 
   const filteredDeals = deals.filter(deal => {
-    const searchLower = searchTerm.toLowerCase();
-    const contact = contacts.find(c => c.Id === parseInt(deal.contactId));
+const searchLower = searchTerm.toLowerCase();
+    const contactId = deal.contact_id_c?.Id || deal.contact_id_c;
+    const contact = contacts.find(c => c.Id === parseInt(contactId));
     
-    return (
-      deal.title.toLowerCase().includes(searchLower) ||
-      (contact && `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchLower)) ||
-      (contact && contact.company.toLowerCase().includes(searchLower))
+return (
+      deal.title_c?.toLowerCase().includes(searchLower) ||
+      (contact && `${contact.firstName || ''} ${contact.lastName || ''}`.toLowerCase().includes(searchLower)) ||
+      (contact && contact.company?.toLowerCase().includes(searchLower))
     );
   });
 

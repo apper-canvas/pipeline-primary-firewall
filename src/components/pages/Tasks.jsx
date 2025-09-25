@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import Button from "@/components/atoms/Button";
-import Badge from "@/components/atoms/Badge";
-import Card from "@/components/atoms/Card";
+import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { toast } from "react-toastify";
+import taskService from "@/services/api/taskService";
+import dealService from "@/services/api/dealService";
+import contactService from "@/services/api/contactService";
+import ApperIcon from "@/components/ApperIcon";
 import SearchBar from "@/components/molecules/SearchBar";
 import Modal from "@/components/molecules/Modal";
 import Loading from "@/components/ui/Loading";
-import Error from "@/components/ui/Error";
 import Empty from "@/components/ui/Empty";
+import Error from "@/components/ui/Error";
 import TaskForm from "@/components/organisms/TaskForm";
-import ApperIcon from "@/components/ApperIcon";
-import taskService from "@/services/api/taskService";
-import contactService from "@/services/api/contactService";
-import dealService from "@/services/api/dealService";
-import { format } from "date-fns";
-import { toast } from "react-toastify";
+import Button from "@/components/atoms/Button";
+import Badge from "@/components/atoms/Badge";
+import Card from "@/components/atoms/Card";
 
 const Tasks = () => {
   const [tasks, setTasks] = useState([]);
@@ -52,7 +52,15 @@ const Tasks = () => {
 
   const handleCreateTask = async (taskData) => {
     try {
-      const newTask = await taskService.create(taskData);
+const newTask = await taskService.create({
+        title_c: taskData.title,
+        description_c: taskData.description,
+        due_date_c: taskData.dueDate,
+        priority_c: taskData.priority,
+        status_c: taskData.status,
+        contact_id_c: taskData.contactId,
+        deal_id_c: taskData.dealId
+      });
       setTasks(prev => [newTask, ...prev]);
     } catch (error) {
       throw new Error("Failed to create task");
@@ -61,7 +69,15 @@ const Tasks = () => {
 
   const handleUpdateTask = async (taskData) => {
     try {
-      const updatedTask = await taskService.update(selectedTask.Id, taskData);
+const updatedTask = await taskService.update(selectedTask.Id, {
+        title_c: taskData.title,
+        description_c: taskData.description,
+        due_date_c: taskData.dueDate,
+        priority_c: taskData.priority,
+        status_c: taskData.status,
+        contact_id_c: taskData.contactId,
+        deal_id_c: taskData.dealId
+      });
       setTasks(prev => prev.map(task => 
         task.Id === updatedTask.Id ? updatedTask : task
       ));
@@ -83,10 +99,10 @@ const Tasks = () => {
   };
 
   const handleToggleTaskStatus = async (task) => {
-    const newStatus = task.status === "completed" ? "pending" : "completed";
+const newStatus = task.status_c === "completed" ? "pending" : "completed";
     
     try {
-      const updatedTask = await taskService.update(task.Id, { ...task, status: newStatus });
+const updatedTask = await taskService.update(task.Id, { status_c: newStatus });
       setTasks(prev => prev.map(t => t.Id === updatedTask.Id ? updatedTask : t));
       toast.success(`Task marked as ${newStatus}!`);
     } catch (error) {
@@ -95,11 +111,13 @@ const Tasks = () => {
   };
 
   const getContact = (contactId) => {
-    return contacts.find(contact => contact.Id === parseInt(contactId));
+const id = contactId?.Id || contactId;
+    return contacts.find(contact => contact.Id === parseInt(id));
   };
 
   const getDeal = (dealId) => {
-    return deals.find(deal => deal.Id === parseInt(dealId));
+const id = dealId?.Id || dealId;
+    return deals.find(deal => deal.Id === parseInt(id));
   };
 
   const getPriorityColor = (priority) => {
@@ -123,10 +141,10 @@ const Tasks = () => {
   };
 
   const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description?.toLowerCase().includes(searchTerm.toLowerCase());
+const matchesSearch = task.title_c?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         task.description_c?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesFilter = filterStatus === "all" || task.status === filterStatus;
+const matchesFilter = filterStatus === "all" || task.status_c === filterStatus;
     
     return matchesSearch && matchesFilter;
   });
@@ -201,8 +219,8 @@ const Tasks = () => {
       ) : (
         <div className="grid gap-4">
           {filteredTasks.map((task) => {
-            const contact = getContact(task.contactId);
-            const deal = getDeal(task.dealId);
+const contact = getContact(task.contact_id_c);
+            const deal = getDeal(task.deal_id_c);
             
             return (
               <Card key={task.Id} className="card-hover">
@@ -212,50 +230,51 @@ const Tasks = () => {
                       <button
                         onClick={() => handleToggleTaskStatus(task)}
                         className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                          task.status === "completed"
+task.status_c === "completed"
                             ? "bg-success border-success"
                             : "border-gray-300 hover:border-success"
                         }`}
                       >
-                        {task.status === "completed" && (
+{task.status_c === "completed" && (
                           <ApperIcon name="Check" className="w-3 h-3 text-white" />
                         )}
                       </button>
                       
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <h3 className={`font-semibold ${task.status === "completed" ? "line-through text-gray-500" : "text-gray-900"}`}>
-                            {task.title}
+<h3 className={`font-semibold ${task.status_c === "completed" ? "line-through text-gray-500" : "text-gray-900"}`}>
+{task.title_c}
                           </h3>
-                          <Badge variant={getPriorityColor(task.priority)}>
-                            {task.priority}
+<Badge variant={getPriorityColor(task.priority_c)}>
+                            {task.priority_c}
                           </Badge>
-                          <Badge variant={getStatusColor(task.status)}>
-                            {task.status}
+                          <Badge variant={getStatusColor(task.status_c)}>
+                            {task.status_c}
                           </Badge>
                         </div>
                         
-                        {task.description && (
-                          <p className="text-gray-600 text-sm mb-3">{task.description}</p>
+                        {task.description_c && (
+                          <p className="text-sm text-gray-600 mb-3">
+                            {task.description_c}
+                          </p>
                         )}
-                        
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center space-x-1">
                             <ApperIcon name="Calendar" className="w-4 h-4" />
-                            <span>{format(new Date(task.dueDate), "MMM dd, yyyy")}</span>
+<span>{format(new Date(task.due_date_c), "MMM dd, yyyy")}</span>
                           </div>
                           
                           {contact && (
                             <div className="flex items-center space-x-1">
                               <ApperIcon name="User" className="w-4 h-4" />
-                              <span>{contact.firstName} {contact.lastName}</span>
+<span>{contact.first_name_c} {contact.last_name_c}</span>
                             </div>
                           )}
                           
                           {deal && (
                             <div className="flex items-center space-x-1">
                               <ApperIcon name="TrendingUp" className="w-4 h-4" />
-                              <span>{deal.title}</span>
+<span>{deal.title_c}</span>
                             </div>
                           )}
                         </div>

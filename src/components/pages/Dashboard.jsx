@@ -57,15 +57,15 @@ const Dashboard = () => {
 
   // Calculate metrics
   const totalDeals = data.deals.length;
-  const activeDeals = data.deals.filter(deal => !["closed-won", "closed-lost"].includes(deal.stage)).length;
-  const totalValue = data.deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
-  const wonValue = data.deals
-    .filter(deal => deal.stage === "closed-won")
-    .reduce((sum, deal) => sum + (deal.value || 0), 0);
+const activeDeals = data.deals.filter(deal => !["closed-won", "closed-lost"].includes(deal.stage_c)).length;
+  const totalValue = data.deals.reduce((sum, deal) => sum + (deal.value_c || 0), 0);
+const wonValue = data.deals
+    .filter(deal => deal.stage_c === "closed-won")
+    .reduce((sum, deal) => sum + (deal.value_c || 0), 0);
   
-  const pendingTasks = data.tasks.filter(task => task.status === "pending").length;
-  const recentActivities = data.activities
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+const pendingTasks = data.tasks.filter(task => task.status_c === "pending").length;
+const recentActivities = data.activities
+    .sort((a, b) => new Date(b.created_at_c) - new Date(a.created_at_c))
     .slice(0, 5);
 
   const getActivityIcon = (type) => {
@@ -150,25 +150,25 @@ const Dashboard = () => {
           <Card.Content>
             <div className="space-y-4">
               {recentActivities.map((activity) => {
-                const contact = data.contacts.find(c => c.Id === parseInt(activity.contactId));
+const contact = data.contacts.find(c => c.Id === parseInt(activity.contact_id_c?.Id || activity.contact_id_c));
                 return (
                   <div key={activity.Id} className="flex items-start space-x-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                       <ApperIcon 
-                        name={getActivityIcon(activity.type)} 
+name={getActivityIcon(activity.type_c)} 
                         className="w-4 h-4 text-primary" 
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{activity.subject}</p>
+<p className="text-sm font-medium text-gray-900">{activity.subject_c}</p>
                       <div className="flex items-center space-x-2 mt-1">
                         {contact && (
-                          <span className="text-xs text-gray-500">
-                            {contact.firstName} {contact.lastName}
+<span className="text-xs text-gray-500">
+                            {contact?.first_name_c} {contact?.last_name_c}
                           </span>
                         )}
-                        <span className="text-xs text-gray-400">
-                          {format(new Date(activity.createdAt), "MMM dd, h:mm a")}
+<span className="text-xs text-gray-400">
+                          {format(new Date(activity.created_at_c), "MMM dd, h:mm a")}
                         </span>
                       </div>
                     </div>
@@ -193,30 +193,30 @@ const Dashboard = () => {
           <Card.Content>
             <div className="space-y-4">
               {data.tasks
-                .filter(task => task.status !== "completed")
-                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+.filter(task => task.status_c !== "completed")
+.sort((a, b) => new Date(a.due_date_c) - new Date(b.due_date_c))
                 .slice(0, 5)
                 .map((task) => {
-                  const contact = data.contacts.find(c => c.Id === parseInt(task.contactId));
+const contact = data.contacts.find(c => c.Id === parseInt(task.contact_id_c?.Id || task.contact_id_c));
                   return (
                     <div key={task.Id} className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
-                          {task.title}
+{task.title_c}
                         </p>
                         <div className="flex items-center space-x-2 mt-1">
-                          <Badge variant={getTaskPriorityColor(task.priority)} className="text-xs">
-                            {task.priority}
+<Badge variant={getTaskPriorityColor(task.priority_c)} className="text-xs">
+                            {task.priority_c}
                           </Badge>
-                          {contact && (
+{contact && (
                             <span className="text-xs text-gray-500">
-                              {contact.firstName} {contact.lastName}
+                              {contact.first_name_c} {contact.last_name_c}
                             </span>
                           )}
                         </div>
                       </div>
-                      <span className="text-xs text-gray-400 ml-2">
-                        {format(new Date(task.dueDate), "MMM dd")}
+<span className="text-xs text-gray-400 ml-2">
+                        {format(new Date(task.due_date_c), "MMM dd")}
                       </span>
                     </div>
                   );
@@ -241,8 +241,8 @@ const Dashboard = () => {
               { stage: "closed-won", name: "Won", color: "bg-green-100" },
               { stage: "closed-lost", name: "Lost", color: "bg-red-100" },
             ].map((stage) => {
-              const stageDeals = data.deals.filter(deal => deal.stage === stage.stage);
-              const stageValue = stageDeals.reduce((sum, deal) => sum + (deal.value || 0), 0);
+const stageDeals = data.deals.filter(deal => deal.stage_c === stage.stage);
+              const stageValue = stageDeals.reduce((sum, deal) => sum + (deal.value_c || 0), 0);
               
               return (
                 <div key={stage.stage} className={`p-4 rounded-lg ${stage.color}`}>

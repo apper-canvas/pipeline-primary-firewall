@@ -1,9 +1,9 @@
 import React from "react";
 import ApperIcon from "@/components/ApperIcon";
-import Button from "@/components/atoms/Button";
 import SearchBar from "@/components/molecules/SearchBar";
+import Button from "@/components/atoms/Button";
 
-const Header = ({ onMenuClick, searchValue, onSearchChange }) => {
+const Header = ({ onMenuClick, searchValue, onSearchChange, onLogout }) => {
   return (
     <header className="bg-white border-b border-gray-200 px-4 lg:px-6 h-16">
       <div className="flex items-center justify-between h-full">
@@ -27,12 +27,22 @@ const Header = ({ onMenuClick, searchValue, onSearchChange }) => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+<div className="flex items-center space-x-3">
           <Button variant="ghost" size="sm" className="relative">
             <ApperIcon name="Bell" className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-4 w-4 bg-error rounded-full text-xs text-white flex items-center justify-center">
               3
             </span>
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={onLogout}
+            className="text-sm font-medium text-gray-700 hover:text-gray-900"
+          >
+            <ApperIcon name="LogOut" className="h-4 w-4 mr-2" />
+            Logout
           </Button>
           
           <div className="w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center">

@@ -34,14 +34,14 @@ const DealForm = ({ deal, onSave, onCancel }) => {
     loadContacts();
     
     if (deal) {
-      setFormData({
-        title: deal.title || "",
-        value: deal.value?.toString() || "",
-        stage: deal.stage || "lead",
-        contactId: deal.contactId || "",
-        probability: deal.probability?.toString() || "10",
-        expectedCloseDate: deal.expectedCloseDate ? deal.expectedCloseDate.split("T")[0] : "",
-        description: deal.description || "",
+setFormData({
+        title: deal.title_c || "",
+        value: deal.value_c?.toString() || "",
+        stage: deal.stage_c || "lead",
+        contactId: deal.contact_id_c?.Id || deal.contact_id_c || "",
+        probability: deal.probability_c?.toString() || "10",
+        expectedCloseDate: deal.expected_close_date_c ? deal.expected_close_date_c.split("T")[0] : "",
+        description: deal.description_c || "",
       });
     }
   }, [deal]);
@@ -158,8 +158,8 @@ const DealForm = ({ deal, onSave, onCancel }) => {
         >
           <option value="">Select a contact</option>
           {contacts.map(contact => (
-            <option key={contact.Id} value={contact.Id}>
-              {contact.firstName} {contact.lastName} - {contact.company}
+<option key={contact.Id} value={contact.Id}>
+              {contact.first_name_c} {contact.last_name_c} - {contact.company_c}
             </option>
           ))}
         </Select>

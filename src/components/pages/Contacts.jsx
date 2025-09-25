@@ -41,7 +41,14 @@ const Contacts = () => {
 
   const handleCreateContact = async (contactData) => {
     try {
-      const newContact = await contactService.create(contactData);
+const newContact = await contactService.create({
+        first_name_c: contactData.firstName,
+        last_name_c: contactData.lastName,
+        email_c: contactData.email,
+        phone_c: contactData.phone,
+        company_c: contactData.company,
+        position_c: contactData.position
+      });
       setContacts(prev => [newContact, ...prev]);
     } catch (error) {
       throw new Error("Failed to create contact");
@@ -50,7 +57,14 @@ const Contacts = () => {
 
   const handleUpdateContact = async (contactData) => {
     try {
-      const updatedContact = await contactService.update(selectedContact.Id, contactData);
+const updatedContact = await contactService.update(selectedContact.Id, {
+        first_name_c: contactData.firstName,
+        last_name_c: contactData.lastName,
+        email_c: contactData.email,
+        phone_c: contactData.phone,
+        company_c: contactData.company,
+        position_c: contactData.position
+      });
       setContacts(prev => prev.map(contact => 
         contact.Id === updatedContact.Id ? updatedContact : contact
       ));
@@ -75,10 +89,10 @@ const Contacts = () => {
   const filteredContacts = contacts.filter(contact => {
     const searchLower = searchTerm.toLowerCase();
     return (
-      contact.firstName.toLowerCase().includes(searchLower) ||
-      contact.lastName.toLowerCase().includes(searchLower) ||
-      contact.email.toLowerCase().includes(searchLower) ||
-      contact.company.toLowerCase().includes(searchLower)
+contact.first_name_c?.toLowerCase().includes(searchLower) ||
+      contact.last_name_c?.toLowerCase().includes(searchLower) ||
+      contact.email_c?.toLowerCase().includes(searchLower) ||
+      contact.company_c?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -171,26 +185,26 @@ const Contacts = () => {
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center">
                           <span className="text-white font-medium">
-                            {contact.firstName[0]}{contact.lastName[0]}
+{contact.first_name_c?.[0]}{contact.last_name_c?.[0]}
                           </span>
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {contact.firstName} {contact.lastName}
+{contact.first_name_c} {contact.last_name_c}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{contact.company}</div>
-                      <div className="text-sm text-gray-500">{contact.position}</div>
+<div className="text-sm text-gray-900">{contact.company_c}</div>
+                      <div className="text-sm text-gray-500">{contact.position_c}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{contact.email}</div>
-                      <div className="text-sm text-gray-500">{contact.phone}</div>
+<div className="text-sm text-gray-900">{contact.email_c}</div>
+                      <div className="text-sm text-gray-500">{contact.phone_c}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {format(new Date(contact.lastActivity), "MMM dd, yyyy")}
+{contact.last_activity_c ? format(new Date(contact.last_activity_c), "MMM dd, yyyy") : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
@@ -252,13 +266,13 @@ const Contacts = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xl font-bold">
-                    {selectedContact.firstName[0]}{selectedContact.lastName[0]}
+<span className="text-white text-xl font-bold">
+                    {selectedContact.first_name_c?.[0]}{selectedContact.last_name_c?.[0]}
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {selectedContact.firstName} {selectedContact.lastName}
+<h3 className="text-2xl font-bold text-gray-900">
+                    {selectedContact.first_name_c} {selectedContact.last_name_c}
                   </h3>
                   <p className="text-secondary">{selectedContact.position} at {selectedContact.company}</p>
                 </div>
@@ -291,15 +305,15 @@ const Contacts = () => {
                 <Card.Content className="space-y-3">
                   <div className="flex items-center space-x-3">
                     <ApperIcon name="Mail" className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-900">{selectedContact.email}</span>
+<span className="text-sm text-gray-900">{selectedContact.email_c}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <ApperIcon name="Phone" className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-900">{selectedContact.phone}</span>
+<span className="text-sm text-gray-900">{selectedContact.phone_c}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <ApperIcon name="Building" className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-900">{selectedContact.company}</span>
+<span className="text-sm text-gray-900">{selectedContact.company_c}</span>
                   </div>
                 </Card.Content>
               </Card>
@@ -312,13 +326,13 @@ const Contacts = () => {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Created</span>
                     <span className="text-gray-900">
-                      {format(new Date(selectedContact.createdAt), "MMM dd, yyyy")}
+{selectedContact.created_at_c ? format(new Date(selectedContact.created_at_c), "MMM dd, yyyy") : "N/A"}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Last Activity</span>
-                    <span className="text-gray-900">
-                      {format(new Date(selectedContact.lastActivity), "MMM dd, yyyy")}
+<span className="text-gray-900">
+                      {selectedContact.last_activity_c ? format(new Date(selectedContact.last_activity_c), "MMM dd, yyyy") : "N/A"}
                     </span>
                   </div>
                 </Card.Content>

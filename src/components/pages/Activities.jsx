@@ -52,7 +52,13 @@ const Activities = () => {
 
   const handleCreateActivity = async (activityData) => {
     try {
-      const newActivity = await activityService.create(activityData);
+const newActivity = await activityService.create({
+        type_c: activityData.type,
+        subject_c: activityData.subject,
+        description_c: activityData.description,
+        contact_id_c: activityData.contactId,
+        deal_id_c: activityData.dealId
+      });
       setActivities(prev => [newActivity, ...prev]);
     } catch (error) {
       throw new Error("Failed to create activity");
@@ -61,7 +67,13 @@ const Activities = () => {
 
   const handleUpdateActivity = async (activityData) => {
     try {
-      const updatedActivity = await activityService.update(selectedActivity.Id, activityData);
+const updatedActivity = await activityService.update(selectedActivity.Id, {
+        type_c: activityData.type,
+        subject_c: activityData.subject,
+        description_c: activityData.description,
+        contact_id_c: activityData.contactId,
+        deal_id_c: activityData.dealId
+      });
       setActivities(prev => prev.map(activity => 
         activity.Id === updatedActivity.Id ? updatedActivity : activity
       ));
@@ -83,11 +95,13 @@ const Activities = () => {
   };
 
   const getContact = (contactId) => {
-    return contacts.find(contact => contact.Id === parseInt(contactId));
+const id = contactId?.Id || contactId;
+    return contacts.find(contact => contact.Id === parseInt(id));
   };
 
   const getDeal = (dealId) => {
-    return deals.find(deal => deal.Id === parseInt(dealId));
+const id = dealId?.Id || dealId;
+    return deals.find(deal => deal.Id === parseInt(id));
   };
 
   const getActivityIcon = (type) => {
@@ -111,10 +125,10 @@ const Activities = () => {
   };
 
   const filteredActivities = activities.filter(activity => {
-    const matchesSearch = activity.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         activity.description?.toLowerCase().includes(searchTerm.toLowerCase());
+const matchesSearch = activity.subject_c?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         activity.description_c?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesFilter = filterType === "all" || activity.type === filterType;
+const matchesFilter = filterType === "all" || activity.type_c === filterType;
     
     return matchesSearch && matchesFilter;
   });
@@ -189,53 +203,52 @@ const Activities = () => {
       ) : (
         <div className="space-y-4">
           {filteredActivities
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+.sort((a, b) => new Date(b.created_at_c) - new Date(a.created_at_c))
             .map((activity) => {
               const contact = getContact(activity.contactId);
-              const deal = getDeal(activity.dealId);
-              
+const deal = getDeal(activity.deal_id_c);
               return (
                 <Card key={activity.Id} className="card-hover">
                   <Card.Content className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4 flex-1">
-                        <div className={`p-2 rounded-lg bg-${getActivityColor(activity.type)}/10`}>
+<div className={`p-2 rounded-lg bg-${getActivityColor(activity.type_c)}/10`}>
                           <ApperIcon 
-                            name={getActivityIcon(activity.type)} 
-                            className={`w-5 h-5 text-${getActivityColor(activity.type) === 'primary' ? 'blue-600' : 
-                              getActivityColor(activity.type) === 'info' ? 'blue-500' :
-                              getActivityColor(activity.type) === 'success' ? 'green-600' :
-                              getActivityColor(activity.type) === 'warning' ? 'yellow-600' : 'gray-600'}`}
+                            name={getActivityIcon(activity.type_c)} 
+                            className={`w-5 h-5 text-${getActivityColor(activity.type_c) === 'primary' ? 'blue-600' : 
+                              getActivityColor(activity.type_c) === 'info' ? 'blue-500' :
+                              getActivityColor(activity.type_c) === 'success' ? 'green-600' :
+                              getActivityColor(activity.type_c) === 'warning' ? 'yellow-600' : 'gray-600'}`}
                           />
                         </div>
                         
                         <div className="flex-1">
                           <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="font-semibold text-gray-900">{activity.subject}</h3>
-                            <Badge variant={getActivityColor(activity.type)}>
-                              {activity.type}
+<h3 className="font-semibold text-gray-900">{activity.subject_c}</h3>
+                            <Badge variant={getActivityColor(activity.type_c)}>
+{activity.type_c}
                             </Badge>
                           </div>
                           
-                          <p className="text-gray-600 text-sm mb-3">{activity.description}</p>
+<p className="text-gray-600 text-sm mb-3">{activity.description_c}</p>
                           
                           <div className="flex items-center space-x-4 text-sm text-gray-500">
                             <div className="flex items-center space-x-1">
                               <ApperIcon name="Clock" className="w-4 h-4" />
-                              <span>{format(new Date(activity.createdAt), "MMM dd, yyyy 'at' h:mm a")}</span>
+<span>{format(new Date(activity.created_at_c), "MMM dd, yyyy 'at' h:mm a")}</span>
                             </div>
                             
                             {contact && (
                               <div className="flex items-center space-x-1">
                                 <ApperIcon name="User" className="w-4 h-4" />
-                                <span>{contact.firstName} {contact.lastName}</span>
+<span>{contact.first_name_c} {contact.last_name_c}</span>
                               </div>
                             )}
                             
                             {deal && (
                               <div className="flex items-center space-x-1">
                                 <ApperIcon name="TrendingUp" className="w-4 h-4" />
-                                <span>{deal.title}</span>
+<span>{deal.title_c}</span>
                               </div>
                             )}
                           </div>

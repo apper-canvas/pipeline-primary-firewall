@@ -8,7 +8,7 @@ import contactService from "@/services/api/contactService";
 import dealService from "@/services/api/dealService";
 
 const TaskForm = ({ task, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     title: "",
     description: "",
     dueDate: "",
@@ -42,14 +42,14 @@ const TaskForm = ({ task, onSave, onCancel }) => {
     loadDeals();
     
     if (task) {
-      setFormData({
-        title: task.title || "",
-        description: task.description || "",
-        dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
-        priority: task.priority || "medium",
-        status: task.status || "pending",
-        contactId: task.contactId || "",
-        dealId: task.dealId || "",
+setFormData({
+        title: task.title_c || "",
+        description: task.description_c || "",
+        dueDate: task.due_date_c ? task.due_date_c.split("T")[0] : "",
+        priority: task.priority_c || "medium",
+        status: task.status_c || "pending",
+        contactId: task.contact_id_c?.Id || task.contact_id_c || "",
+        dealId: task.deal_id_c?.Id || task.deal_id_c || "",
       });
     }
   }, [task]);
@@ -182,9 +182,9 @@ const TaskForm = ({ task, onSave, onCancel }) => {
           onChange={handleChange}
         >
           <option value="">Select a contact</option>
-          {contacts.map(contact => (
+{contacts.map(contact => (
             <option key={contact.Id} value={contact.Id}>
-              {contact.firstName} {contact.lastName} - {contact.company}
+              {contact.first_name_c} {contact.last_name_c} - {contact.company_c}
             </option>
           ))}
         </Select>
@@ -196,9 +196,9 @@ const TaskForm = ({ task, onSave, onCancel }) => {
           onChange={handleChange}
         >
           <option value="">Select a deal</option>
-          {deals.map(deal => (
+{deals.map(deal => (
             <option key={deal.Id} value={deal.Id}>
-              {deal.title}
+              {deal.title_c}
             </option>
           ))}
         </Select>

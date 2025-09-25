@@ -8,7 +8,7 @@ import contactService from "@/services/api/contactService";
 import dealService from "@/services/api/dealService";
 
 const ActivityForm = ({ activity, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     type: "call",
     subject: "",
     description: "",
@@ -32,13 +32,13 @@ const ActivityForm = ({ activity, onSave, onCancel }) => {
     loadContacts();
     loadDeals();
     
-    if (activity) {
+if (activity) {
       setFormData({
-        type: activity.type || "call",
-        subject: activity.subject || "",
-        description: activity.description || "",
-        contactId: activity.contactId || "",
-        dealId: activity.dealId || "",
+        type: activity.type_c || "call",
+        subject: activity.subject_c || "",
+        description: activity.description_c || "",
+        contactId: activity.contact_id_c?.Id || activity.contact_id_c || "",
+        dealId: activity.deal_id_c?.Id || activity.deal_id_c || "",
       });
     }
   }, [activity]);
@@ -150,9 +150,9 @@ const ActivityForm = ({ activity, onSave, onCancel }) => {
           onChange={handleChange}
         >
           <option value="">Select a contact</option>
-          {contacts.map(contact => (
+{contacts.map(contact => (
             <option key={contact.Id} value={contact.Id}>
-              {contact.firstName} {contact.lastName} - {contact.company}
+              {contact.first_name_c} {contact.last_name_c} - {contact.company_c}
             </option>
           ))}
         </Select>
@@ -165,8 +165,8 @@ const ActivityForm = ({ activity, onSave, onCancel }) => {
         >
           <option value="">Select a deal</option>
           {deals.map(deal => (
-            <option key={deal.Id} value={deal.Id}>
-              {deal.title}
+<option key={deal.Id} value={deal.Id}>
+              {deal.title_c}
             </option>
           ))}
         </Select>

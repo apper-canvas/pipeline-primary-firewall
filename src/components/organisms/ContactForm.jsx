@@ -4,7 +4,7 @@ import Input from "@/components/atoms/Input";
 import { toast } from "react-toastify";
 
 const ContactForm = ({ contact, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -18,13 +18,13 @@ const ContactForm = ({ contact, onSave, onCancel }) => {
 
   useEffect(() => {
     if (contact) {
-      setFormData({
-        firstName: contact.firstName || "",
-        lastName: contact.lastName || "",
-        email: contact.email || "",
-        phone: contact.phone || "",
-        company: contact.company || "",
-        position: contact.position || "",
+setFormData({
+        firstName: contact.first_name_c || "",
+        lastName: contact.last_name_c || "",
+        email: contact.email_c || "",
+        phone: contact.phone_c || "",
+        company: contact.company_c || "",
+        position: contact.position_c || "",
       });
     }
   }, [contact]);

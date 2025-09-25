@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import ApperIcon from "@/components/ApperIcon";
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = ({ isOpen, onClose, onLogout }) => {
   const location = useLocation();
 
   const navigation = [
@@ -52,15 +52,24 @@ const Sidebar = ({ isOpen, onClose }) => {
             ))}
           </nav>
           
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center">
-                <ApperIcon name="User" className="h-4 w-4 text-gray-600" />
+<div className="p-4 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center">
+                  <ApperIcon name="User" className="h-4 w-4 text-gray-600" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-gray-900">Sales Team</p>
+                  <p className="text-xs text-gray-500">Administrator</p>
+                </div>
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">Sales Team</p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
+              <button
+                onClick={onLogout}
+                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                title="Logout"
+              >
+                <ApperIcon name="LogOut" className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -93,15 +102,24 @@ const Sidebar = ({ isOpen, onClose }) => {
                 ))}
               </nav>
               
-              <div className="p-4 border-t border-gray-200">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center">
-                    <ApperIcon name="User" className="h-4 w-4 text-gray-600" />
+<div className="p-4 border-t border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center">
+                      <ApperIcon name="User" className="h-4 w-4 text-gray-600" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-900">Sales Team</p>
+                      <p className="text-xs text-gray-500">Administrator</p>
+                    </div>
                   </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">Sales Team</p>
-                    <p className="text-xs text-gray-500">Administrator</p>
-                  </div>
+                  <button
+                    onClick={onLogout}
+                    className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    title="Logout"
+                  >
+                    <ApperIcon name="LogOut" className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </div>

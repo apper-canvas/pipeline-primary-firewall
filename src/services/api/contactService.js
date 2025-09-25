@@ -1,70 +1,193 @@
-import contactsData from "@/services/mockData/contacts.json";
-
 class ContactService {
   constructor() {
-    this.contacts = [...contactsData];
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    this.tableName = 'contact_c';
   }
 
   async getAll() {
-    await this.delay(300);
-    return [...this.contacts];
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "first_name_c"}},
+          {"field": {"Name": "last_name_c"}},
+          {"field": {"Name": "email_c"}},
+          {"field": {"Name": "phone_c"}},
+          {"field": {"Name": "company_c"}},
+          {"field": {"Name": "position_c"}},
+          {"field": {"Name": "created_at_c"}},
+          {"field": {"Name": "last_activity_c"}}
+        ],
+        orderBy: [{"fieldName": "Id", "sorttype": "DESC"}]
+      };
+      
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error("Error fetching contacts:", response.message);
+        return [];
+      }
+      
+      return response.data || [];
+    } catch (error) {
+      console.error("Error fetching contacts:", error?.response?.data?.message || error);
+      return [];
+    }
   }
 
   async getById(id) {
-    await this.delay(200);
-    const contact = this.contacts.find(contact => contact.Id === parseInt(id));
-    if (!contact) {
-      throw new Error("Contact not found");
+    try {
+      const params = {
+        fields: [
+          {"field": {"Name": "Id"}},
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "first_name_c"}},
+          {"field": {"Name": "last_name_c"}},
+          {"field": {"Name": "email_c"}},
+          {"field": {"Name": "phone_c"}},
+          {"field": {"Name": "company_c"}},
+          {"field": {"Name": "position_c"}},
+          {"field": {"Name": "created_at_c"}},
+          {"field": {"Name": "last_activity_c"}}
+        ]
+      };
+      
+      const response = await this.apperClient.getRecordById(this.tableName, parseInt(id), params);
+      
+      if (!response.success || !response.data) {
+        console.error("Contact not found:", response.message);
+        throw new Error("Contact not found");
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching contact ${id}:`, error?.response?.data?.message || error);
+      throw error;
     }
-    return { ...contact };
   }
 
   async create(contactData) {
-    await this.delay(400);
-    const newContact = {
-      ...contactData,
-      Id: this.getNextId(),
-      createdAt: new Date().toISOString(),
-      lastActivity: new Date().toISOString(),
-    };
-    this.contacts.push(newContact);
-    return { ...newContact };
+    try {
+      const params = {
+        records: [{
+          Name: contactData.first_name_c + " " + contactData.last_name_c,
+          first_name_c: contactData.first_name_c,
+          last_name_c: contactData.last_name_c,
+          email_c: contactData.email_c,
+          phone_c: contactData.phone_c,
+          company_c: contactData.company_c,
+          position_c: contactData.position_c,
+          created_at_c: new Date().toISOString(),
+          last_activity_c: new Date().toISOString()
+        }]
+      };
+      
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error("Error creating contact:", response.message);
+        throw new Error(response.message);
+      }
+      
+      if (response.results) {
+        const successful = response.results.filter(r => r.success);
+        const failed = response.results.filter(r => !r.success);
+        
+        if (failed.length > 0) {
+          console.error(`Failed to create ${failed.length} contacts:`, failed);
+          throw new Error(failed[0].message || "Failed to create contact");
+        }
+        
+        return successful[0]?.data || {};
+      }
+      
+      throw new Error("Unexpected response format");
+    } catch (error) {
+      console.error("Error creating contact:", error?.response?.data?.message || error);
+      throw error;
+    }
   }
 
   async update(id, contactData) {
-    await this.delay(400);
-    const index = this.contacts.findIndex(contact => contact.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Contact not found");
+    try {
+      const params = {
+        records: [{
+          Id: parseInt(id),
+          Name: contactData.first_name_c + " " + contactData.last_name_c,
+          first_name_c: contactData.first_name_c,
+          last_name_c: contactData.last_name_c,
+          email_c: contactData.email_c,
+          phone_c: contactData.phone_c,
+          company_c: contactData.company_c,
+          position_c: contactData.position_c,
+          last_activity_c: new Date().toISOString()
+        }]
+      };
+      
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error("Error updating contact:", response.message);
+        throw new Error(response.message);
+      }
+      
+      if (response.results) {
+        const successful = response.results.filter(r => r.success);
+        const failed = response.results.filter(r => !r.success);
+        
+        if (failed.length > 0) {
+          console.error(`Failed to update ${failed.length} contacts:`, failed);
+          throw new Error(failed[0].message || "Failed to update contact");
+        }
+        
+        return successful[0]?.data || {};
+      }
+      
+      throw new Error("Unexpected response format");
+    } catch (error) {
+      console.error("Error updating contact:", error?.response?.data?.message || error);
+      throw error;
     }
-    
-    const updatedContact = {
-      ...this.contacts[index],
-      ...contactData,
-      Id: parseInt(id),
-    };
-    this.contacts[index] = updatedContact;
-    return { ...updatedContact };
   }
 
   async delete(id) {
-    await this.delay(300);
-    const index = this.contacts.findIndex(contact => contact.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Contact not found");
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+      
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error("Error deleting contact:", response.message);
+        throw new Error(response.message);
+      }
+      
+      if (response.results) {
+        const successful = response.results.filter(r => r.success);
+        const failed = response.results.filter(r => !r.success);
+        
+        if (failed.length > 0) {
+          console.error(`Failed to delete ${failed.length} contacts:`, failed);
+          throw new Error(failed[0].message || "Failed to delete contact");
+        }
+        
+        return { success: successful.length > 0 };
+      }
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error deleting contact:", error?.response?.data?.message || error);
+      throw error;
     }
-    
-    this.contacts.splice(index, 1);
-    return { success: true };
-  }
-
-  getNextId() {
-    return Math.max(...this.contacts.map(contact => contact.Id), 0) + 1;
-  }
-
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
+
+export default new ContactService();
 
 export default new ContactService();

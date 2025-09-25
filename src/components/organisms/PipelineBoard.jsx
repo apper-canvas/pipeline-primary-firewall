@@ -21,8 +21,9 @@ const PipelineBoard = ({ deals, contacts, onEditDeal, onDeleteDeal }) => {
     return deals.filter(deal => deal.stage === stageId);
   };
 
-  const getContact = (contactId) => {
-    return contacts.find(contact => contact.Id === parseInt(contactId));
+const getContact = (contactId) => {
+    const id = contactId?.Id || contactId;
+    return contacts.find(contact => contact.Id === parseInt(id));
   };
 
   const getPriorityColor = (probability) => {
@@ -42,16 +43,15 @@ const PipelineBoard = ({ deals, contacts, onEditDeal, onDeleteDeal }) => {
 
   const handleDrop = (e, stageId) => {
     e.preventDefault();
-    if (draggedDeal && draggedDeal.stage !== stageId) {
-      const updatedDeal = { ...draggedDeal, stage: stageId };
+if (draggedDeal && draggedDeal.stage_c !== stageId) {
+      const updatedDeal = { ...draggedDeal, stage_c: stageId };
       onEditDeal(updatedDeal);
     }
     setDraggedDeal(null);
   };
 
   const DealCard = ({ deal }) => {
-    const contact = getContact(deal.contactId);
-    
+const contact = getContact(deal.contact_id_c);
     return (
       <Card 
         className="mb-3 cursor-move hover:shadow-md transition-all duration-200"
@@ -81,7 +81,14 @@ const PipelineBoard = ({ deals, contacts, onEditDeal, onDeleteDeal }) => {
             </div>
           </div>
           
-          <div className="text-lg font-bold text-primary mb-2">
+<div className="text-lg font-bold text-primary mb-2">
+            ${deal.value_c ? deal.value_c.toLocaleString() : '0'}
+          </div>
+          <div className="font-medium text-gray-900 mb-2">
+            {deal.title_c}
+          </div>
+          
+          <div className="text-sm text-gray-600 mb-3">
             ${deal.value?.toLocaleString()}
           </div>
           
@@ -89,18 +96,18 @@ const PipelineBoard = ({ deals, contacts, onEditDeal, onDeleteDeal }) => {
             {contact && (
               <div className="flex items-center text-xs text-gray-600">
                 <ApperIcon name="User" className="h-3 w-3 mr-1" />
-                {contact.firstName} {contact.lastName}
+{contact.first_name_c} {contact.last_name_c}
               </div>
             )}
             
             <div className="flex items-center justify-between">
-              <Badge variant={getPriorityColor(deal.probability)}>
-                {deal.probability}%
+<Badge variant={getPriorityColor(deal.probability_c)}>
+                {deal.probability_c}%
               </Badge>
               
-              {deal.expectedCloseDate && (
+{deal.expected_close_date_c && (
                 <span className="text-xs text-gray-500">
-                  {format(new Date(deal.expectedCloseDate), "MMM dd")}
+                  {format(new Date(deal.expected_close_date_c), "MMM dd")}
                 </span>
               )}
             </div>
@@ -113,7 +120,24 @@ const PipelineBoard = ({ deals, contacts, onEditDeal, onDeleteDeal }) => {
   return (
     <div className="flex space-x-6 overflow-x-auto pb-4">
       {stages.map(stage => {
-        const stageDeals = getDealsByStage(stage.id);
+const stageDeals = getDealsByStage(stage.id);
+        
+        const handleDragStart = (e, deal) => {
+          e.dataTransfer.setData("text/plain", JSON.stringify(deal));
+        };
+        
+        const handleDragOver = (e) => {
+          e.preventDefault();
+        };
+        
+        const handleDrop = (e, stageId) => {
+          e.preventDefault();
+          const draggedDeal = JSON.parse(e.dataTransfer.getData("text/plain"));
+          if (draggedDeal && draggedDeal.stage_c !== stageId) {
+            const updatedDeal = { ...draggedDeal, stage_c: stageId };
+            onEditDeal(updatedDeal);
+          }
+        };
         const stageValue = stageDeals.reduce((total, deal) => total + (deal.value || 0), 0);
         
         return (
