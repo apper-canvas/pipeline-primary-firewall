@@ -189,5 +189,3 @@ class ContactService {
 }
 
 export default new ContactService();
-
-export default new ContactService();
