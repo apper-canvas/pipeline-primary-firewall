@@ -71,7 +71,7 @@ class ContactService {
     }
   }
 
-  async create(contactData) {
+async create(contactData) {
     try {
       const params = {
         records: [{
@@ -103,7 +103,38 @@ class ContactService {
           throw new Error(failed[0].message || "Failed to create contact");
         }
         
-        return successful[0]?.data || {};
+        const createdContact = successful[0]?.data || {};
+        
+        // Send welcome email after successful contact creation
+        if (createdContact && contactData.email_c) {
+          try {
+            const emailResponse = await this.apperClient.functions.invoke(
+              import.meta.env.VITE_SEND_WELCOME_EMAIL,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  contactName: contactData.first_name_c + " " + contactData.last_name_c,
+                  contactEmail: contactData.email_c
+                })
+              }
+            );
+            
+            // Add email status to contact object for UI feedback
+            createdContact._emailSent = emailResponse.success || false;
+            createdContact._emailError = emailResponse.success ? null : emailResponse.message;
+            
+          } catch (emailError) {
+            console.error("Failed to send welcome email:", emailError);
+            // Don't throw - contact creation should succeed even if email fails
+            createdContact._emailSent = false;
+            createdContact._emailError = emailError.message || "Email service unavailable";
+          }
+        }
+        
+        return createdContact;
       }
       
       throw new Error("Unexpected response format");

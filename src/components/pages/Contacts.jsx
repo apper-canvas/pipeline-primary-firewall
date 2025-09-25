@@ -39,9 +39,9 @@ const Contacts = () => {
     }
   };
 
-  const handleCreateContact = async (contactData) => {
+const handleCreateContact = async (contactData) => {
     try {
-const newContact = await contactService.create({
+      const newContact = await contactService.create({
         first_name_c: contactData.firstName,
         last_name_c: contactData.lastName,
         email_c: contactData.email,
@@ -49,7 +49,19 @@ const newContact = await contactService.create({
         company_c: contactData.company,
         position_c: contactData.position
       });
+      
       setContacts(prev => [newContact, ...prev]);
+      
+      // Provide feedback about email status
+      if (newContact._emailSent) {
+        toast.success(`Contact created and welcome email sent to ${contactData.email}!`);
+      } else if (newContact._emailError) {
+        toast.success("Contact created successfully!");
+        toast.warning(`Welcome email could not be sent: ${newContact._emailError}`);
+      } else {
+        toast.success("Contact created successfully!");
+      }
+      
     } catch (error) {
       throw new Error("Failed to create contact");
     }
